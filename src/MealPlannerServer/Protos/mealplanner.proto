@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+import "google/protobuf/duration.proto";  
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "MealPlannerServer";
+
+service MealPlanner {
+
+rpc RegisterMeal(MealRegisterRequest) returns (MealRegisterResponse);
+
+rpc GetRegisteredMeals(GetAllMealsRequest) returns (stream MealRegisterResponse);
+}
+
+message GetAllMealsRequest{}
+
+message MealRegisterRequest{
+	string MealName = 1;
+	google.protobuf.Timestamp MealDateTime = 2;
+}
+
+message MealRegisterResponse{
+	string response = 1;
+}

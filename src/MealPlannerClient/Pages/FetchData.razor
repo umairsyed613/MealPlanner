@@ -1,0 +1,63 @@
+@page "/fetchdata"
+@inject HttpClient Http
+@inject Grpc.Net.Client.GrpcChannel Channel
+@using MealPlannerServer
+@using System.Threading
+@using Grpc.Core
+
+<h1>gRPC Streams</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+<button class="btn-outline-primary mx-2" @onclick="ReadDataFromServer">Start Reading</button>
+<button class="btn-outline-primary mx-2" @onclick="StopReadDataFromServer">Stop Reading</button>
+
+@if (comments == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+<div class=" d-flex flex-column flex-nowrap mt-4 mb-3">
+    @foreach (var comment in comments)
+    {
+        <span>@comment</span>
+    }
+</div>
+}
+
+@code {
+    private List<string> comments;
+    private CancellationTokenSource CancellationTokenSource;
+
+    protected override async Task OnInitializedAsync()
+    {
+        comments = new List<string>();
+        CancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(60));
+    }
+
+    public async Task ReadDataFromServer()
+    {
+        try
+        {
+            var client = new MealPlanner.MealPlannerClient(Channel);
+            using (var call = client.GetRegisteredMeals(new GetAllMealsRequest()))
+            {
+                while (await call.ResponseStream.MoveNext(CancellationTokenSource.Token))
+                {
+                    comments.Add(call.ResponseStream.Current.Response);
+                    StateHasChanged();
+                }
+            }
+        }
+        catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
+        {               
+            Console.WriteLine("Stream cancelled.");
+        }
+    }
+
+    public void StopReadDataFromServer()
+    {
+        CancellationTokenSource.Cancel(false);
+    }
+}

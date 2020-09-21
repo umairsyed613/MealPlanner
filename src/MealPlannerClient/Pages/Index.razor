@@ -1,0 +1,32 @@
+﻿@page "/"
+@inject Grpc.Net.Client.GrpcChannel Channel
+@using MealPlannerServer
+@using Google.Protobuf.WellKnownTypes
+
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<div class="mt-4">
+
+    <button class="btn-primary" @onclick="SayHelloToServer">Say Hello</button>
+</div>
+
+<div class="mt-4">
+    <span>@reply</span>
+</div>
+
+@code
+{
+    private string reply;
+
+    public async Task SayHelloToServer()
+    {
+        var client = new MealPlanner.MealPlannerClient(Channel);
+        var r = await client.RegisterMealAsync(new MealRegisterRequest { MealName = "Kebab", MealDateTime = Timestamp.FromDateTime(DateTime.UtcNow)});
+
+        reply = r.Response;
+
+    }
+}
