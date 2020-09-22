@@ -1,0 +1,65 @@
+﻿@page "/planmeal"
+@using System.Globalization
+
+<style>
+    .daybox {
+        height: 150px;
+        width: 200px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .daybox:hover {
+            background-color: #350a4b;
+            color: white;
+        }
+
+    .day {
+        top: 2px;
+        right: -165px;
+        font-size: 1.5rem;
+        color: gray;
+    }
+
+    .meals {
+        top: -15px;
+        left: 2px;
+        font-size: 1rem;
+    }
+
+    .month{
+        width: 408px;
+        height: 150px;
+        }
+</style>
+
+<h3>PlanMeal</h3>
+<hr />
+
+<div class="d-flex flex-row flex-wrap">
+    <div class="month border mx-1 mb-2 align-middle">
+        <span class="text-center">@getMonthName(2020, 09)</span>
+    </div>
+
+    @for (int i = 1; i <= DateTime.DaysInMonth(2020, 09); i++)
+    {
+        <div class="daybox border mx-1 mb-2">
+            <span class="day position-relative">@i</span>
+            <div class="position-relative mx-1 meals">
+                <div class="mb-1">B:</div>
+                <div class="mb-1">L:</div>
+                <div class="mb-1">D:</div>
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+
+    public string getMonthName(int year, int month)
+    {
+        return new DateTime(year, month, 1)
+            .ToString("MMMM", CultureInfo.InvariantCulture);
+    }
+}
